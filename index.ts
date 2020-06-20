@@ -2,6 +2,7 @@ import * as http from 'http'
 import {IncomingMessage, ServerResponse} from 'http'
 import * as fs from 'fs'
 import * as p from 'path'
+import * as url from 'url'
 
 const server = http.createServer()
 
@@ -27,9 +28,10 @@ const server = http.createServer()
 const publicDir = p.resolve(__dirname,'public') // public所在的绝对路径
 // 任务一,根据url返回不同的文件
 server.on('request', (request: IncomingMessage, response: ServerResponse) => { // 通过添加request的实际类型，来使得我们不需要看文档，因为一些历史原因使得我们的提示不够智能
-  const {method, url, headers} = request
-  console.log(url)
-  switch(url){
+  const {method, url:path, headers} = request // 从request中读取url，并且重新命名为path
+  console.log(path)
+  const {pathname, search} = url.parse(path)
+  switch(pathname){
     case '/index.html':
       response.setHeader('Content-Type','text/html; charset=utf-8') // 要告诉浏览器内容的类型，否则都是HTML
       fs.readFile(p.resolve(publicDir, 'index.html'), (error, data)=>{
