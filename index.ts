@@ -31,29 +31,41 @@ server.on('request', (request: IncomingMessage, response: ServerResponse) => { /
   const {method, url:path, headers} = request // 从request中读取url，并且重新命名为path
   console.log(path)
   const {pathname, search} = url.parse(path)
-  switch(pathname){
-    case '/index.html':
-      response.setHeader('Content-Type','text/html; charset=utf-8') // 要告诉浏览器内容的类型，否则都是HTML
-      fs.readFile(p.resolve(publicDir, 'index.html'), (error, data)=>{
-        if(error) throw error;
-        response.end(data.toString()) // data是一个buffer
-      })
-      break;
-    case '/style.css':
-      response.setHeader('Content-Type','text/css; charset=utf-8') // 要告诉浏览器内容的类型，否则都是HTML
-      fs.readFile(p.resolve(publicDir, 'style.css'), (error, data)=>{
-        if(error) throw error;
-        response.end(data.toString()) // data是一个buffer
-      })
-      break;
-    case '/main.js':
-      response.setHeader('Content-Type','text/javascript; charset=utf-8') // 要告诉浏览器内容的类型，否则都是HTML
-      fs.readFile(p.resolve(publicDir, 'main.js'), (error, data)=>{
-        if(error) throw error;
-        response.end(data.toString()) // data是一个buffer
-      })
-      break;
-  }
+  // switch(pathname){
+    // case '/index.html':
+    //   response.setHeader('Content-Type','text/html; charset=utf-8') // 要告诉浏览器内容的类型，否则都是HTML
+    //   fs.readFile(p.resolve(publicDir, 'index.html'), (error, data)=>{
+    //     if(error) throw error;
+    //     response.end(data.toString()) // data是一个buffer
+    //   })
+    //   break;
+    // case '/style.css':
+    //   response.setHeader('Content-Type','text/css; charset=utf-8') // 要告诉浏览器内容的类型，否则都是HTML
+    //   fs.readFile(p.resolve(publicDir, 'style.css'), (error, data)=>{
+    //     if(error) throw error;
+    //     response.end(data.toString()) // data是一个buffer
+    //   })
+    //   break;
+    // case '/main.js':
+    //   response.setHeader('Content-Type','text/javascript; charset=utf-8') // 要告诉浏览器内容的类型，否则都是HTML
+    //   fs.readFile(p.resolve(publicDir, 'main.js'), (error, data)=>{
+    //     if(error) throw error;
+    //     response.end(data.toString()) // data是一个buffer
+    //   })
+    //   break;
+    //   response.setHeader('Content-Type','text/html; charset=utf-8') // 要告诉浏览器内容的类型，否则都是HTML
+    // }
+
+    // /index.html => index.html
+  const filename = pathname.substr(1);
+  fs.readFile(p.resolve(publicDir, filename), (error, data)=>{
+    if(error) {
+      response.statusCode = 404;
+      response.end('你要的文件不存在');
+    } else {
+      response.end(data.toString()) // data是一个buffer
+    }
+  })
 })
 
 server.listen(8888)
