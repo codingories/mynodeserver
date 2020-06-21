@@ -25,56 +25,38 @@ const server = http.createServer()
 //   })
 // })
 
-const publicDir = p.resolve(__dirname,'public') // public所在的绝对路径
+const publicDir = p.resolve(__dirname, 'public') // public所在的绝对路径
 // 任务一,根据url返回不同的文件
 server.on('request', (request: IncomingMessage, response: ServerResponse) => { // 通过添加request的实际类型，来使得我们不需要看文档，因为一些历史原因使得我们的提示不够智能
-  const {method, url:path, headers} = request // 从request中读取url，并且重新命名为path
-  // console.log(path)
+  const {method, url: path, headers} = request // 从request中读取url，并且重新命名为path
   const {pathname, search} = url.parse(path)
-  // switch(pathname){
-    // case '/index.html':
-    //   response.setHeader('Content-Type','text/html; charset=utf-8') // 要告诉浏览器内容的类型，否则都是HTML
-    //   fs.readFile(p.resolve(publicDir, 'index.html'), (error, data)=>{
-    //     if(error) throw error;
-    //     response.end(data.toString()) // data是一个buffer
-    //   })
-    //   break;
-    // case '/style.css':
-    //   response.setHeader('Content-Type','text/css; charset=utf-8') // 要告诉浏览器内容的类型，否则都是HTML
-    //   fs.readFile(p.resolve(publicDir, 'style.css'), (error, data)=>{
-    //     if(error) throw error;
-    //     response.end(data.toString()) // data是一个buffer
-    //   })
-    //   break;
-    // case '/main.js':
-    //   response.setHeader('Content-Type','text/javascript; charset=utf-8') // 要告诉浏览器内容的类型，否则都是HTML
-    //   fs.readFile(p.resolve(publicDir, 'main.js'), (error, data)=>{
-    //     if(error) throw error;
-    //     response.end(data.toString()) // data是一个buffer
-    //   })
-    //   break;
-    //   response.setHeader('Content-Type','text/html; charset=utf-8') // 要告诉浏览器内容的类型，否则都是HTML
-    // }
 
-    // /index.html => index.html
-  let filename = pathname.substr(1);
-  if(filename === ''){
+  if (method !== 'GET') {
+    // response.statusCode = 405;
+    // response.end()
+    response.statusCode = 200
+    response.end('this is a fake response')
+    return
+  }
+
+  let filename = pathname.substr(1)
+  if (filename === '') {
     filename = 'index.html'
   }
-  fs.readFile(p.resolve(publicDir, filename), (error, data)=>{
-    if(error) {
+  fs.readFile(p.resolve(publicDir, filename), (error, data) => {
+    if (error) {
       console.log(error)
-      if(error.errno === -2){
-        response.statusCode = 404;
-        fs.readFile(p.resolve(publicDir, '404.html'), (error, data)=>{
+      if (error.errno === -2) {
+        response.statusCode = 404
+        fs.readFile(p.resolve(publicDir, '404.html'), (error, data) => {
           response.end(data)
         })
-      }else if(error.errno === -21){
-        response.statusCode = 403; // 403没全县
-        response.end('no authority');
-      } else{
-        response.statusCode = 500; // 5开头服务器问题
-        response.end('server is busy');
+      } else if (error.errno === -21) {
+        response.statusCode = 403 // 403没全县
+        response.end('no authority')
+      } else {
+        response.statusCode = 500 // 5开头服务器问题
+        response.end('server is busy')
       }
     } else {
       response.end(data) // data是一个buffer
